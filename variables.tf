@@ -51,6 +51,12 @@ variable "jenkins_x_namespace" {
   default     = "jx"
 }
 
+variable "enable_autopilot" {
+  description = "Enable GKE autopilot feature"
+  type        = bool
+  default     = false
+}
+
 variable "force_destroy" {
   description = "Flag to determine whether storage buckets get forcefully destroyed"
   type        = bool
