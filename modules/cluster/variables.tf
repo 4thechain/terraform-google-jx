@@ -366,7 +366,7 @@ variable "enable_legacy_abac" {
 
 variable "enable_shielded_nodes" {
   type    = bool
-  default = true
+  default = ! var.enable_autopilot ? true : false
 }
 
 variable "auto_repair" {

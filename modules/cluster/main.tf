@@ -46,13 +46,14 @@ resource "google_container_cluster" "jx_cluster" {
   }
 
   workload_identity_config {
+    count              = var.enable_autopilot ? 1 : 0
     identity_namespace = "${var.gcp_project}.svc.id.goog"
   }
 
   resource_labels = var.resource_labels
 
   cluster_autoscaling {
-    enabled = true
+    enabled = ! var.enable_autopilot ? true : false
 
     auto_provisioning_defaults {
       oauth_scopes = local.cluster_oauth_scopes
@@ -72,6 +73,7 @@ resource "google_container_cluster" "jx_cluster" {
   }
 
   node_config {
+    count        = var.enable_autopilot ? 0 : 1
     preemptible  = var.node_preemptible
     machine_type = var.node_machine_type
     disk_size_gb = var.node_disk_size
