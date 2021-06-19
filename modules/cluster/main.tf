@@ -24,7 +24,7 @@ resource "google_container_cluster" "jx_cluster" {
   enable_autopilot        = var.enable_autopilot
   enable_kubernetes_alpha = var.enable_kubernetes_alpha
   enable_legacy_abac      = var.enable_legacy_abac
-  enable_shielded_nodes   = var.enable_shielded_nodes
+  enable_shielded_nodes   = var.enable_autopilot ? false : var.enable_shielded_nodes
   initial_node_count      = var.min_node_count
   logging_service         = var.logging_service
   monitoring_service      = var.monitoring_service
