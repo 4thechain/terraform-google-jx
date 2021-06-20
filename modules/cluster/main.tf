@@ -24,7 +24,6 @@ resource "google_container_cluster" "jx_cluster" {
   enable_autopilot        = var.enable_autopilot
   enable_kubernetes_alpha = var.enable_kubernetes_alpha
   enable_legacy_abac      = var.enable_legacy_abac
-  enable_shielded_nodes   = var.enable_autopilot ? false : var.enable_shielded_nodes
   initial_node_count      = var.min_node_count
   logging_service         = var.logging_service
   monitoring_service      = var.monitoring_service
@@ -45,50 +44,8 @@ resource "google_container_cluster" "jx_cluster" {
     channel = var.release_channel
   }
 
-  dynamic "workload_identity_config" {
-    for_each = var.enable_autopilot ? [""] : []
-    content {
-      identity_namespace = "${var.gcp_project}.svc.id.goog"
-    }
-  }
-
   resource_labels = var.resource_labels
 
-  cluster_autoscaling {
-    enabled = ! var.enable_autopilot ? true : false
-
-    auto_provisioning_defaults {
-      oauth_scopes = local.cluster_oauth_scopes
-    }
-
-    resource_limits {
-      resource_type = "cpu"
-      minimum       = ceil(var.min_node_count * var.machine_types_cpu[var.node_machine_type])
-      maximum       = ceil(var.max_node_count * var.machine_types_cpu[var.node_machine_type])
-    }
-
-    resource_limits {
-      resource_type = "memory"
-      minimum       = ceil(var.min_node_count * var.machine_types_memory[var.node_machine_type])
-      maximum       = ceil(var.max_node_count * var.machine_types_memory[var.node_machine_type])
-    }
-  }
-
-  dynamic "node_config" {
-    for_each = var.enable_autopilot ? [] : [""]
-    content {
-      preemptible  = var.node_preemptible
-      machine_type = var.node_machine_type
-      disk_size_gb = var.node_disk_size
-      disk_type    = var.node_disk_type
-
-      oauth_scopes = local.cluster_oauth_scopes
-
-      workload_metadata_config {
-        node_metadata = "GKE_METADATA_SERVER"
-      }
-    }
-  }
 }
 
 module "jx-health" {
