@@ -158,6 +158,7 @@ module "cluster" {
   cluster_id          = random_id.random.hex
   bucket_location     = var.bucket_location
   jenkins_x_namespace = var.jenkins_x_namespace
+  enable_autopilot    = var.enable_autopilot
   force_destroy       = var.force_destroy
 
   node_machine_type = var.node_machine_type
