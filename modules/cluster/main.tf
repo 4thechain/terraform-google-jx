@@ -45,9 +45,11 @@ resource "google_container_cluster" "jx_cluster" {
     channel = var.release_channel
   }
 
-  workload_identity_config {
-    count              = var.enable_autopilot ? 1 : 0
-    identity_namespace = "${var.gcp_project}.svc.id.goog"
+  dynamic "workload_identity_config" {
+    for_each = var.enable_autopilot ? [""] : []
+    content {
+      identity_namespace = "${var.gcp_project}.svc.id.goog"
+    }
   }
 
   resource_labels = var.resource_labels
@@ -72,19 +74,20 @@ resource "google_container_cluster" "jx_cluster" {
     }
   }
 
-  node_config {
-    count        = var.enable_autopilot ? 0 : 1
-    preemptible  = var.node_preemptible
-    machine_type = var.node_machine_type
-    disk_size_gb = var.node_disk_size
-    disk_type    = var.node_disk_type
+  dynamic "node_config" {
+    for_each = var.enable_autopilot ? [] : [""]
+    content {
+      preemptible  = var.node_preemptible
+      machine_type = var.node_machine_type
+      disk_size_gb = var.node_disk_size
+      disk_type    = var.node_disk_type
 
-    oauth_scopes = local.cluster_oauth_scopes
+      oauth_scopes = local.cluster_oauth_scopes
 
-    workload_metadata_config {
-      node_metadata = "GKE_METADATA_SERVER"
+      workload_metadata_config {
+        node_metadata = "GKE_METADATA_SERVER"
+      }
     }
-
   }
 }
 
